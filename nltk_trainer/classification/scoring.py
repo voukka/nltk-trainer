@@ -106,7 +106,7 @@ def cross_fold(instances, trainf, testf, folds=10, trace=1, metrics=True, inform
         accuracies.append(accuracy)
 
         if trace:
-            print 'accuracy: %f' % accuracy
+            print 'accuracy: %4.2f' % accuracy
 
         if trace:
             print 'testing on %d:%d' % (start, end)
@@ -128,7 +128,7 @@ def cross_fold(instances, trainf, testf, folds=10, trace=1, metrics=True, inform
                 f_measures[key].append(f)
 
                 if trace:
-                    print '%s, %f, %f, %f' % (key, p, r, f)
+                    print '%5s, %4.2f, %4.2f, %4.2f' % (key, p, r, f)
 
         if trace and informative and hasattr(obj, 'show_most_informative_features'):
             obj.show_most_informative_features(informative)
@@ -136,19 +136,23 @@ def cross_fold(instances, trainf, testf, folds=10, trace=1, metrics=True, inform
     if trace:
         print '\nmean and variance across folds'
         print '------------------------------'
-        print 'accuracy mean: %f' % (sum(accuracies) / folds)
-        print 'accuracy variance: %f' % array(accuracies).var()
+        print 'accuracy mean: %4.2f' % (sum(accuracies) / folds)
+        print 'accuracy variance: %4.2f' % array(accuracies).var()
 
+        print '%s, precision mean, precision variance, recall mean, recall variance, f_measure mean, f_measure variance'
         for key, ps in precisions.iteritems():
-            print '%s precision mean: %f' % (key, sum(ps) / folds)
-            print '%s precision variance: %f' % (key, array(ps).var())
 
-        for key, rs in recalls.iteritems():
-            print '%s recall mean: %f' % (key, sum(rs) / folds)
-            print '%s recall variance: %f' % (key, array(rs).var())
+            # recalls and f_measures collections should have this key anyway, so let's unify results outputs a bit
+            rs = recalls.get(key)
+            fs = f_measures.get(key)
+            precision_mean = sum(ps) / folds
+            precision_var = array(ps).var()
+            recall_mean = sum(rs) / folds
+            recall_var = array(rs).var()
+            f_measure_mean = sum(fs) / folds
+            f_measure_var = array(fs).var()
 
-        for key, fs in f_measures.iteritems():
-            print '%s f_measure mean: %f' % (key, sum(fs) / folds)
-            print '%s f_measure variance: %f' % (key, array(fs).var())
+            print '%5s, %4.2f, %4.2f, %4.2f, %4.2f, %4.2f, %4.2f' % \
+                  (key, precision_mean, precision_var, recall_mean, recall_var, f_measure_mean, f_measure_var)
 
     return accuracies, precisions, recalls, f_measures
