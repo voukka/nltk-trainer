@@ -102,6 +102,12 @@ def cross_fold(instances, trainf, testf, folds=10, trace=1, metrics=True, inform
 
         obj = trainf(train_instances)
 
+        accuracy = testf(obj, test_instances)
+        accuracies.append(accuracy)
+
+        if trace:
+            print 'accuracy: %f' % accuracy
+
         if trace:
             print 'testing on %d:%d' % (start, end)
 
@@ -123,13 +129,6 @@ def cross_fold(instances, trainf, testf, folds=10, trace=1, metrics=True, inform
 
                 if trace:
                     print '%s, %f, %f, %f' % (key, p, r, f)
-
-        accuracy = testf(obj, test_instances)
-
-        if trace:
-            print 'accuracy: %f' % accuracy
-
-        accuracies.append(accuracy)
 
         if trace and informative and hasattr(obj, 'show_most_informative_features'):
             obj.show_most_informative_features(informative)
