@@ -2,6 +2,7 @@ import collections, random
 from numpy import array
 from nltk.metrics import masi_distance, f_measure, precision, recall
 from nltk.probability import FreqDist, ConditionalFreqDist
+from utils import mean_confidence_interval
 
 
 def sum_category_word_scores(categorized_words, score_fn):
@@ -130,6 +131,13 @@ def cross_fold(instances, trainf, testf, folds=10, trace=1, metrics=True, inform
                 if trace:
                     print '%5s, %4.2f, %4.2f, %4.2f' % (key, p, r, f)
 
+        if trace:
+            print '\naccuracy for each fold'
+            print '------------------------------'
+            print '%5s, %10s' % ('fold#', 'accuracy')
+            for idx, fold_accuracy in enumerate(accuracies):
+                print '%5s, %4.2f' % (idx, fold_accuracy)
+
         if trace and informative and hasattr(obj, 'show_most_informative_features'):
             obj.show_most_informative_features(informative)
 
@@ -142,7 +150,8 @@ def cross_fold(instances, trainf, testf, folds=10, trace=1, metrics=True, inform
         print '%s, precision mean, precision variance, recall mean, recall variance, f_measure mean, f_measure variance'
         for key, ps in precisions.iteritems():
 
-            # recalls and f_measures collections should have this key anyway, so let's unify results outputs a bit
+            # recalls and f_measures collections should have this key anyway,
+            #  so let's group results outputs by label
             rs = recalls.get(key)
             fs = f_measures.get(key)
             precision_mean = sum(ps) / folds
